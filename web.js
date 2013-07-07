@@ -4,6 +4,7 @@ var app = express.createServer(express.logger());
 
 app.get('/', function(request, response)
 {
+    var fs = require('fs');
     var filename = "index.html";
     var buffer = fs.readFileSync(filename);
     var text_to_display = buffer.toString();

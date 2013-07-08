@@ -55,20 +55,83 @@ var checkHtmlFile = function(htmlfile, checksfile) {
     return out;
 };
 
+
+
+var checkHtmlString = function(htmlstring, checksfile)
+{
+    $ = cheerio.load(htmlstring);
+    //console.log(htmlstring);     
+    var checks = loadChecks(checksfile).sort();
+    var out = {};
+
+    for(var ii in checks)
+    {   //console.log(checks[ii]);
+        //console.log($(checks[ii]).length);             
+        var present = $(checks[ii]).length > 0;
+        out[checks[ii]] = present;
+    }
+    return out;
+};
+
+
+
+var buildfn = function(checksfile)
+{
+    var response2console = function(result, response)
+    {
+        if (result instanceof Error)
+	{
+            console.error('Error: ' + util.format(response.message));
+        }
+	else
+	{
+            var checkJson = checkHtmlString(result, checksfile);
+            var outJson = JSON.stringify(checkJson, null, 4);
+            console.log(outJson);
+        }
+    };
+    
+    return response2console;
+};
+
+
+
+var checkURL = function(url, checksfile)
+{
+    var rest = require('restler');
+    var response2console = buildfn(checksfile);
+    rest.get(url).on('complete', response2console);   
+};
+
+'/cygdrive/d/Nico/Programming/Startup Engineering/Week_3/index.html'
+
 var clone = function(fn) {
     // Workaround for commander.js issue.
     // http://stackoverflow.com/a/6772648
     return fn.bind({});
 };
 
-if(require.main == module) {
+if(require.main == module)
+{
     program
         .option('-c, --checks <check_file>', 'Path to checks.json', clone(assertFileExists), CHECKSFILE_DEFAULT)
         .option('-f, --file <html_file>', 'Path to index.html', clone(assertFileExists), HTMLFILE_DEFAULT)
+        .option('-u, --url <url>', 'url to index.html')         
         .parse(process.argv);
-    var checkJson = checkHtmlFile(program.file, program.checks);
-    var outJson = JSON.stringify(checkJson, null, 4);
-    console.log(outJson);
-} else {
+
+ 
+    if(program.url != undefined)
+    {
+        checkURL(program.url, program.checks); //not very nice, The inside functions do too much
+    } 
+    else
+    {     
+        var checkJson = checkHtmlFile(program.file, program.checks);
+        var outJson = JSON.stringify(checkJson, null, 4);
+        console.log(outJson);
+    }
+}
+else
+{
     exports.checkHtmlFile = checkHtmlFile;
 }

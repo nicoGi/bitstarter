@@ -4,6 +4,15 @@
   "dependencies": {
     "express": "2.5.x"
   },
+
+
+"devDependencies": {
+    "commander": "*"
+    , "cheerio": "*"
+    , "restler": "*"
+  }
+  ,
+
   "engines": {
     "node": "0.8.x",
     "npm": "1.1.x"
